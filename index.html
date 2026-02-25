@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patient Management — Draft UI</title>
+
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+
+  <style>
+    :root{
+      --bg: #f7fbff;
+      --surface: rgba(255,255,255,.92);
+      --line: rgba(12, 52, 107, .16);
+
+      --blue: #0d6efd;
+      --blue-100: #e8f1ff;
+
+      --red: #dc3545;
+      --red-100: #ffe9ec;
+
+      --text: #0b2a4a;
+      --muted: rgba(11, 42, 74, .62);
+
+      --shadow: 0 18px 55px rgba(10, 35, 70, .10);
+      --radius: 18px;
+    }
+
+    body{
+      background:
+        radial-gradient(1100px 680px at 15% -10%, rgba(13,110,253,.16), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(220,53,69,.12), transparent 58%),
+        linear-gradient(180deg, var(--bg), #ffffff);
+      color: var(--text);
+    }
+
+    /* Draft / wireframe feel */
+    .draft-surface{
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .draft-inner{
+      border: 1px dashed rgba(12, 52, 107, .14);
+      border-radius: 14px;
+      background: rgba(255,255,255,.86);
+    }
+
+    .nav-surface{
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(12, 52, 107, .10);
+    }
+
+    .muted{ color: var(--muted) !important; }
+
+    .badge-draft{
+      border: 1px dashed rgba(12, 52, 107, .25);
+      background: rgba(13,110,253,.06);
+      color: rgba(11, 42, 74, .78);
+      font-weight: 700;
+      letter-spacing: .4px;
+    }
+
+    .btn-blue{
+      background: var(--blue);
+      border-color: var(--blue);
+      font-weight: 700;
+    }
+    .btn-red{
+      background: var(--red);
+      border-color: var(--red);
+      font-weight: 700;
+    }
+    .btn-outline-draft{
+      border: 1px dashed rgba(12, 52, 107, .28);
+      color: rgba(11, 42, 74, .85);
+      background: rgba(255,255,255,.75);
+      font-weight: 700;
+    }
+    .btn-outline-draft:hover{
+      background: rgba(13,110,253,.06);
+    }
+
+    .form-control, .form-select{
+      background: rgba(255,255,255,.92) !important;
+      border: 1px dashed rgba(12, 52, 107, .22) !important;
+      color: var(--text) !important;
+    }
+    .form-control::placeholder{ color: rgba(11,42,74,.45) !important; }
+    .form-control:focus, .form-select:focus{
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.14) !important;
+      border-color: rgba(13,110,253,.45) !important;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:.35rem .65rem;
+      border-radius: 999px;
+      border: 1px dashed rgba(12, 52, 107, .22);
+      background: rgba(255,255,255,.85);
+      font-size: .92rem;
+      color: rgba(11,42,74,.8);
+      white-space: nowrap;
+    }
+    .pill.blue{ background: rgba(13,110,253,.08); border-color: rgba(13,110,253,.28); }
+    .pill.red{ background: rgba(220,53,69,.08); border-color: rgba(220,53,69,.28); }
+
+    .table thead th{
+      background: rgba(13,110,253,.06);
+      border-bottom: 1px dashed rgba(12, 52, 107, .18) !important;
+      color: rgba(11,42,74,.86);
+    }
+    .table td, .table th{
+      border-top: 1px dashed rgba(12, 52, 107, .14) !important;
+      vertical-align: middle;
+    }
+
+    .skeleton{
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(13,110,253,.10), rgba(220,53,69,.08), rgba(13,110,253,.10));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+      border: 1px dashed rgba(12,52,107,.10);
+    }
+    @keyframes shimmer{
+      0%{ background-position: 0% 0; }
+      100%{ background-position: 200% 0; }
+    }
+
+    .ribbon{
+      position: absolute;
+      top: 14px;
+      right: -42px;
+      transform: rotate(35deg);
+      background: rgba(220,53,69,.92);
+      color: white;
+      padding: 6px 52px;
+      font-weight: 900;
+      letter-spacing: .6px;
+      font-size: 12px;
+      box-shadow: 0 10px 25px rgba(220,53,69,.20);
+    }
+
+    .iconbox{
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      background: rgba(13,110,253,.10);
+      border: 1px dashed rgba(13,110,253,.30);
+      color: rgba(13,110,253,.85);
+      font-weight: 900;
+    }
+
+    .card-title{ letter-spacing: .15px; }
+
+    /* Small helper for “draft annotations” */
+    .note{
+      font-size: 12px;
+      color: rgba(11,42,74,.58);
+      border-left: 3px solid rgba(220,53,69,.35);
+      padding-left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top bar -->
+  <nav class="sticky-top nav-surface">
+    <div class="container py-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="iconbox" aria-hidden="true">PM</div>
+        <div>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <h1 class="h5 mb-0">Patient Management</h1>
+            <span class="badge badge-draft rounded-pill">DRAFT UI</span>
+            <span class="pill red">Not for production</span>
+          </div>
+          <div class="small muted">Wireframe-style layout · White / Blue / Red palette · Bootstrap 5</div>
+        </div>
+
+        <div class="ms-auto d-none d-md-flex align-items-center gap-2">
+          <span class="pill blue">Clinic: Demo Health</span>
+          <span class="pill">Today: <span id="today"></span></span>
+          <button class="btn btn-outline-draft btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#draftModal">
+            Draft notes
+          </button>
+        </div>
+      </div>
+
+      <div class="row g-2 mt-3">
+        <div class="col-12 col-md-5">
+          <input id="q" class="form-control" type="search" placeholder="Search patients (name, ID, phone…)" />
+        </div>
+        <div class="col-6 col-md-2">
+          <select id="status" class="form-select" aria-label="Status">
+            <option value="all">All statuses</option>
+            <option value="Active">Active</option>
+            <option value="Follow-up">Follow-up</option>
+            <option value="Discharged">Discharged</option>
+            <option value="At Risk">At Risk</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <select id="sort" class="form-select" aria-label="Sort">
+            <option value="recent">Sort: Recent</option>
+            <option value="nameAsc">Name: A → Z</option>
+            <option value="riskFirst">Risk: High first</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3 d-grid d-md-flex gap-2">
+          <button class="btn btn-blue flex-fill" type="button" data-bs-toggle="modal" data-bs-target="#newPatientModal">
+            + New patient
+          </button>
+          <button class="btn btn-red flex-fill" type="button" data-bs-toggle="modal" data-bs-target="#alertModal">
+            Create alert
+          </button>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <span class="badge rounded-pill chip badge-draft" role="button" tabindex="0" data-chip="appt">Has appointment</span>
+        <span class="badge rounded-pill chip badge-draft" role="button" tabindex="0" data-chip="risk">At risk</span>
+        <span class="badge rounded-pill chip badge-draft" role="button" tabindex="0" data-chip="lab">Pending labs</span>
+        <span class="badge rounded-pill chip badge-draft" role="button" tabindex="0" data-chip="msg">Unread messages</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <div class="row g-3">
+      <!-- Left: Patient list -->
+      <div class="col-12 col-lg-7">
+        <div class="draft-surface position-relative p-3 p-md-4">
+          <div class="ribbon">DRAFT</div>
+
+          <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+            <div>
+              <h2 class="h6 mb-1">Patients</h2>
+              <div class="small muted">Click a row to preview details (mock behavior).</div>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <span class="pill blue" id="countPill">0 patients</span>
+              <button id="clear" class="btn btn-outline-draft btn-sm" type="button">Clear filters</button>
+            </div>
+          </div>
+
+          <div class="table-responsive mt-3">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="min-width: 220px;">Patient</th>
+                  <th>Risk</th>
+                  <th>Status</th>
+                  <th>Last visit</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="patientsTbody"></tbody>
+            </table>
+          </div>
+
+          <div class="mt-3 note">
+            Draft note: table columns and actions are placeholders. Replace with real permissions & audit logging.
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Preview + widgets -->
+      <div class="col-12 col-lg-5">
+        <div class="draft-surface p-3 p-md-4">
+          <div class="d-flex align-items-center justify-content-between gap-2">
+            <div>
+              <h2 class="h6 mb-1">Patient preview</h2>
+              <div class="small muted">Wireframe details (select a patient).</div>
+            </div>
+            <span class="badge badge-draft rounded-pill">Placeholder</span>
+          </div>
+
+          <div class="draft-inner p-3 mt-3">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+              <div style="min-width: 0;">
+                <div class="fw-semibold" id="pvName">Select a patient</div>
+                <div class="small muted" id="pvMeta">—</div>
+              </div>
+              <div class="d-flex gap-2 flex-wrap justify-content-end">
+                <span class="pill blue" id="pvStatus">Status: —</span>
+                <span class="pill red" id="pvRisk">Risk: —</span>
+              </div>
+            </div>
+
+            <div class="row g-3 mt-2">
+              <div class="col-12">
+                <div class="small muted mb-1">Notes (draft)</div>
+                <div class="skeleton mb-2"></div>
+                <div class="skeleton mb-2" style="width: 80%;"></div>
+                <div class="skeleton" style="width: 65%;"></div>
+              </div>
+              <div class="col-12">
+                <div class="small muted mb-1">Quick actions</div>
+                <div class="d-flex flex-wrap gap-2">
+                  <button class="btn btn-outline-draft btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#apptModal">Schedule</button>
+                  <button class="btn btn-outline-draft btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#msgModal">Message</button>
+                  <button class="btn btn-outline-draft btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#labModal">Order labs</button>
+                  <button class="btn btn-outline-draft btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#dischargeModal">Discharge</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-3">
+            <div class="col-12">
+              <div class="draft-inner p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Today’s appointments</div>
+                    <div class="small muted">Draft cards (no real data).</div>
+                  </div>
+                  <span class="pill blue">3</span>
+                </div>
+
+                <div class="mt-3 d-grid gap-2">
+                  <div class="draft-inner p-3">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <div class="fw-semibold">10:30 — Follow-up</div>
+                        <div class="small muted">Room 2 · Dr. Rivera</div>
+                      </div>
+                      <span class="pill red">High</span>
+                    </div>
+                    <div class="skeleton mt-2" style="width: 85%;"></div>
+                  </div>
+
+                  <div class="draft-inner p-3">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <div class="fw-semibold">12:10 — New consult</div>
+                        <div class="small muted">Room 1 · Dr. Chen</div>
+                      </div>
+                      <span class="pill blue">Normal</span>
+                    </div>
+                    <div class="skeleton mt-2" style="width: 70%;"></div>
+                  </div>
+
+                  <div class="draft-inner p-3">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <div class="fw-semibold">16:00 — Lab review</div>
+                        <div class="small muted">Televisit · Nurse Team</div>
+                      </div>
+                      <span class="pill blue">Normal</span>
+                    </div>
+                    <div class="skeleton mt-2" style="width: 78%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="draft-inner p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">Alerts</div>
+                    <div class="small muted">Draft alert feed.</div>
+                  </div>
+                  <span class="pill red">2</span>
+                </div>
+                <div class="mt-3 d-grid gap-2">
+                  <div class="d-flex align-items-start gap-2">
+                    <span class="pill red">!</span>
+                    <div>
+                      <div class="fw-semibold">Medication review needed</div>
+                      <div class="small muted">Placeholder text for alert content.</div>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-start gap-2">
+                    <span class="pill red">!</span>
+                    <div>
+                      <div class="fw-semibold">Missing consent form</div>
+                      <div class="small muted">Placeholder text for alert content.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-4 small muted d-flex flex-wrap justify-content-between gap-2">
+      <div>© <span id="year"></span> Patient Management — Draft UI</div>
+      <div>UI-only mock · No backend · No real patient data</div>
+    </footer>
+  </main>
+
+  <!-- Draft Notes Modal -->
+  <div class="modal fade" id="draftModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border: 1px dashed rgba(12,52,107,.22);">
+        <div class="modal-header">
+          <h5 class="modal-title">Draft notes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="mb-0">
+            <li>Wireframe-style: dashed borders, placeholder text, skeleton bars.</li>
+            <li>Colors: white + blue + red (pastel surfaces).</li>
+            <li>Replace mock modals with real flows + validation + roles.</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-draft btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Patient Modal -->
+  <div class="modal fade" id="newPatientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" style="border: 1px dashed rgba(12,52,107,.22);">
+        <div class="modal-header">
+          <div>
+            <div class="small muted">DRAFT FORM</div>
+            <h5 class="modal-title mb-0">New patient</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full name</label>
+              <input class="form-control" placeholder="e.g. Taylor Jordan" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">DOB</label>
+              <input class="form-control" placeholder="YYYY-MM-DD" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Patient ID</label>
+              <input class="form-control" placeholder="AUTO / draft" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input class="form-control" placeholder="+34 600 000 000" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Primary clinician</label>
+              <select class="form-select">
+                <option>Dr. Rivera</option>
+                <option>Dr. Chen</option>
+                <option>Nurse Team</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="3" placeholder="Draft: intake notes, allergies, etc."></textarea>
+            </div>
+          </div>
+          <div class="mt-3 note">
+            Draft note: add consent, insurance, emergency contact, and audit trail later.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-draft btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-blue btn-sm" type="button" onclick="return false;">Save (mock)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Alert Modal -->
+  <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border: 1px dashed rgba(220,53,69,.35);">
+        <div class="modal-header">
+          <div>
+            <div class="small muted">DRAFT FLOW</div>
+            <h5 class="modal-title mb-0">Create alert</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label">Alert type</label>
+          <select class="form-select mb-3">
+            <option>Medication review</option>
+            <option>Missing documentation</option>
+            <option>Critical lab result</option>
+          </select>
+          <label class="form-label">Message</label>
+          <textarea class="form-control" rows="3" placeholder="Draft alert details..."></textarea>
+          <div class="mt-3 d-flex gap-2 flex-wrap">
+            <span class="pill red">Severity: High</span>
+            <span class="pill blue">Notify: Team</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-draft btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-red btn-sm" type="button" onclick="return false;">Create (mock)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick-action modals (placeholders) -->
+  <div class="modal fade" id="apptModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border: 1px dashed rgba(12,52,107,.22);">
+        <div class="modal-header">
+          <h5 class="modal-title">Schedule appointment (draft)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="skeleton mb-2"></div>
+          <div class="skeleton mb-2" style="width: 75%;"></div>
+          <div class="skeleton" style="width: 55%;"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-draft btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="msgModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border: 1px dashed rgba(12,52,107,.22);">
+        <div class="modal-header">
+          <h5 class="modal-title">Message patient (draft)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" rows="4" placeholder="Draft message..."></textarea>
+          <div class="mt-2 small muted">Placeholder: templates, attachments, consent checks.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-draft btn-sm" data-bs-dismiss="modal">Close</button>
+          <button class="btn btn-blue btn-sm" type="button" onclick="return false;">Send (mock)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="labModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border: 1px dashed rgba(12,52,107,.22);">
+        <div class="modal-header">
+          <h5 class="modal-title">Order labs (draft)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-2">
+            <div class="col-12">
+              <input class="form-control" placeholder="Search lab tests (draft)" />
+            </div>
+            <div class="col-12">
+              <div class="draft-inner p-3">
+                <div class="d-flex justify-content-between">
+                  <span class="fw-semibold">CBC</span><span class="pill blue">Add</span>
+                </div>
+                <div class="small muted">Placeholder description</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="draft-inner p-3">
+                <div class="d-flex justify-content-between">
+                  <span class="fw-semibold">CMP</span><span class="pill blue">Add</span>
+                </div>
+                <div class="small muted">Placeholder description</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-draft btn-sm" data-bs-dismiss="modal">Close</button>
+          <button class="btn btn-blue btn-sm" type="button" onclick="return false;">Order (mock)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="dischargeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border: 1px dashed rgba(220,53,69,.35);">
+        <div class="modal-header">
+          <h5 class="modal-title">Discharge patient (draft)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger mb-2" style="border: 1px dashed rgba(220,53,69,.35); background: rgba(255,233,236,.85);">
+            Draft warning: confirm consent + follow-up plan before discharge.
+          </div>
+          <textarea class="form-control" rows="3" placeholder="Draft discharge summary..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-draft btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-red btn-sm" type="button" onclick="return false;">Discharge (mock)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"
+  ></script>
+
+  <script>
+    // Demo-only mock data (not real patients)
+    const patients = [
+      { id:"P-1042", name:"Avery Morgan", phone:"+34 600 123 900", risk:"High", status:"At Risk", last:"2026-02-20", tags:{ appt:true, risk:true, lab:true, msg:false } },
+      { id:"P-1188", name:"Jordan Lee", phone:"+34 600 888 120", risk:"Low", status:"Active", last:"2026-02-14", tags:{ appt:false, risk:false, lab:false, msg:true } },
+      { id:"P-1201", name:"Sam Patel", phone:"+34 600 010 440", risk:"Medium", status:"Follow-up", last:"2026-02-22", tags:{ appt:true, risk:false, lab:true, msg:true } },
+      { id:"P-1310", name:"Casey Nguyen", phone:"+34 600 321 555", risk:"Low", status:"Discharged", last:"2026-01-28", tags:{ appt:false, risk:false, lab:false, msg:false } },
+      { id:"P-1407", name:"Riley Kim", phone:"+34 600 777 222", risk:"High", status:"Follow-up", last:"2026-02-10", tags:{ appt:true, risk:true, lab:false, msg:true } }
+    ];
+
+    const tbody = document.getElementById("patientsTbody");
+    const q = document.getElementById("q");
+    const statusSel = document.getElementById("status");
+    const sortSel = document.getElementById("sort");
+    const clearBtn = document.getElementById("clear");
+    const countPill = document.getElementById("countPill");
+
+    const chips = Array.from(document.querySelectorAll(".chip"));
+
+    const pvName = document.getElementById("pvName");
+    const pvMeta = document.getElementById("pvMeta");
+    const pvStatus = document.getElementById("pvStatus");
+    const pvRisk = document.getElementById("pvRisk");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("today").textContent = new Date().toISOString().slice(0,10);
+
+    function activeChipKeys(){
+      return chips.filter(c => c.classList.contains("active")).map(c => c.dataset.chip);
+    }
+
+    function riskWeight(r){
+      return r === "High" ? 3 : (r === "Medium" ? 2 : 1);
+    }
+
+    function apply(){
+      const query = (q.value || "").trim().toLowerCase();
+      const status = statusSel.value;
+      const chipKeys = activeChipKeys();
+
+      let out = patients.filter(p => {
+        const matchesQuery =
+          !query ||
+          p.name.toLowerCase().includes(query) ||
+          p.id.toLowerCase().includes(query) ||
+          p.phone.toLowerCase().includes(query);
+
+        const matchesStatus = status === "all" || p.status === status;
+
+        const matchesChips = chipKeys.every(k => !!p.tags[k]);
+
+        return matchesQuery && matchesStatus && matchesChips;
+      });
+
+      const s = sortSel.value;
+      out.sort((a,b) => {
+        if (s === "recent") return (b.last.localeCompare(a.last));
+        if (s === "nameAsc") return a.name.localeCompare(b.name);
+        if (s === "riskFirst") return riskWeight(b.risk) - riskWeight(a.risk) || b.last.localeCompare(a.last);
+        return 0;
+      });
+
+      render(out);
+    }
+
+    function render(items){
+      countPill.textContent = `${items.length} patient${items.length === 1 ? "" : "s"}`;
+
+      tbody.innerHTML = items.map(p => {
+        const riskPill = p.risk === "High"
+          ? `<span class="pill red">High</span>`
+          : (p.risk === "Medium" ? `<span class="pill blue">Medium</span>` : `<span class="pill">Low</span>`);
+
+        const statusPill = p.status === "At Risk"
+          ? `<span class="pill red">${p.status}</span>`
+          : `<span class="pill blue">${p.status}</span>`;
+
+        return `
+          <tr class="patient-row" data-id="${p.id}" style="cursor:pointer;">
+            <td>
+              <div class="fw-semibold">${p.name}</div>
+              <div class="small muted">${p.id} · ${p.phone}</div>
+            </td>
+            <td>${riskPill}</td>
+            <td>${statusPill}</td>
+            <td><span class="small muted">${p.last}</span></td>
+            <td class="text-end">
+              <button class="btn btn-outline-draft btn-sm me-1" type="button" onclick="event.stopPropagation(); mockAction('Open chart')">Chart</button>
+              <button class="btn btn-outline-draft btn-sm" type="button" onclick="event.stopPropagation(); mockAction('Edit')">Edit</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".patient-row").forEach(row => {
+        row.addEventListener("click", () => {
+          const id = row.dataset.id;
+          const p = patients.find(x => x.id === id);
+          if (!p) return;
+          pvName.textContent = p.name;
+          pvMeta.textContent = `${p.id} · ${p.phone} · Last visit ${p.last}`;
+          pvStatus.textContent = `Status: ${p.status}`;
+          pvRisk.textContent = `Risk: ${p.risk}`;
+        });
+      });
+
+      // If nothing selected yet, keep draft placeholder
+      if (pvName.textContent === "Select a patient" && items[0]) {
+        // intentionally do nothing to keep it looking like a draft
+      }
+    }
+
+    function mockAction(label){
+      // Intentionally minimal “draft” behavior
+      alert(`${label} (mock)`);
+    }
+
+    // Chip toggles
+    chips.forEach(ch => {
+      ch.addEventListener("click", () => { ch.classList.toggle("active"); apply(); });
+      ch.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); ch.classList.toggle("active"); apply(); }
+      });
+    });
+
+    // Filters
+    q.addEventListener("input", apply);
+    statusSel.addEventListener("change", apply);
+    sortSel.addEventListener("change", apply);
+
+    clearBtn.addEventListener("click", () => {
+      q.value = "";
+      statusSel.value = "all";
+      sortSel.value = "recent";
+      chips.forEach(c => c.classList.remove("active"));
+      pvName.textContent = "Select a patient";
+      pvMeta.textContent = "—";
+      pvStatus.textContent = "Status: —";
+      pvRisk.textContent = "Risk: —";
+      apply();
+    });
+
+    // init
+    apply();
+  </script>
+</body>
+</html>
